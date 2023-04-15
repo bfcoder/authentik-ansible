@@ -10,5 +10,5 @@
 
 auth.<yourdomain>.com {
   import dnschallenge
-  reverse_proxy authentikserver:3000
+  reverse_proxy authentik:3000
 }
