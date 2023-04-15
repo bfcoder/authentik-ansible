@@ -1,0 +1,97 @@
+---
+- name: Installing gnupg
+  apt:
+    name: gnupg
+    state: latest
+    update_cache: true
+    install_recommends: no
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu jammy stable
+    state: present
+
+- name: Installing ca-certificates
+  apt:
+    name: ca-certificates
+    state: latest
+    update_cache: true
+    install_recommends: no
+
+- name: Installing curl
+  apt:
+    name: curl
+    state: latest
+    update_cache: true
+    install_recommends: no
+
+- name: Installing lsb-release
+  apt:
+    name: lsb-release
+    state: latest
+    update_cache: true
+    install_recommends: no
+
+- name: Installing python3-requests
+  apt:
+    name: python3-requests
+    state: latest
+    update_cache: true
+    install_recommends: no
+
+- name: Install docker-ce
+  apt:
+    name: docker-ce
+    state: latest
+    update_cache: true
+    install_recommends: no
+
+- name: Install docker-ce-cli
+  apt:
+    name: docker-ce-cli
+    state: latest
+    update_cache: true
+    install_recommends: no
+
+- name: Install containerd.io
+  apt:
+    name: containerd.io
+    state: latest
+    update_cache: true
+    install_recommends: no
+
+- name: Install docker-buildx-plugin
+  apt:
+    name: docker-buildx-plugin
+    state: latest
+    update_cache: true
+    install_recommends: no
+
+- name: Install docker-compose-plugin
+  apt:
+    name: docker-compose-plugin
+    state: latest
+    update_cache: true
+    install_recommends: no
+
+- name: Ensure Docker group exists
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+- name: Add user to Docker group
+  ansible.builtin.user:
+    name: "{{ ansible_ssh_user }}"
+    groups: docker
+    append: true
+
+- name: Enable Docker service
+  ansible.builtin.service:
+    name: docker
+    enabled: true
+    state: started

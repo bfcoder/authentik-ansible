@@ -1,0 +1,42 @@
+---
+- name: Create /opt/authentik directory
+  file:
+    path: "/opt/authentik"
+    state: directory
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    mode: u=rwx,g=rwx,o=
+
+- name: Copy .env
+  template:
+    src: .env
+    dest: /opt/authentik/.env
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    mode: u=rw,g=r,o=
+  become: yes
+
+- name: Copy docker-compose.yml
+  template:
+    src: docker-compose.yml
+    dest: /opt/authentik/docker-compose.yml
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    mode: u=rw,g=r,o=
+  become: yes
+
+- name: Copy authentik service
+  template:
+    src: systemd/authentik.service
+    dest: /etc/systemd/system/authentik.service
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    mode: u=rw,g=r,o=
+  become: yes
+
+- name: Enable authentik service
+  systemd:
+    state: started
+    enabled: yes
+    daemon_reload: yes
+    name: authentik

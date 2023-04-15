@@ -1,0 +1,9 @@
+---
+- hosts:
+    - authentik-server
+  become: true
+  become_user: root
+  roles:
+    - role: essential
+    - role: docker
+    - role: docker-compose
