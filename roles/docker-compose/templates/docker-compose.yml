@@ -2,6 +2,8 @@
 version: '3.4'
 
 # modified from https://web.archive.org/web/20230414232745/https://goauthentik.io/docker-compose.yml
+# https://web.archive.org/web/20230415133810/https://helgeklein.com/blog/authentik-authentication-sso-user-management-password-reset-for-home-networks/
+# https://web.archive.org/web/20230415133819/https://helgeklein.com/blog/automatic-https-certificates-for-services-on-internal-home-network-without-opening-firewall-port/
 
 networks:
   web:
