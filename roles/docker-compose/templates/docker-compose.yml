@@ -114,15 +114,3 @@ services:
       - .env
     networks:
       - internal
-
-# volumes:
-#   database:
-#     driver: local
-#   redis:
-#     driver: local
-#   authentik_media:
-#     driver: local
-#   authentik_certs:
-#     driver: local
-#   authentik_custom:
-#     driver: local
