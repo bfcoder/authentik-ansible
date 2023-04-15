@@ -30,3 +30,14 @@
     - "{{ mnt_dir }}/media"
     - "{{ mnt_dir }}/certs"
     - "{{ mnt_dir }}/custom_templates"
+    - "{{ mnt_dir }}/caddy"
+    - "{{ mnt_dir }}/caddy/data"
+    - "{{ mnt_dir }}/caddy/config"
+
+- name: Copy Caddyfile
+  ansible.builtin.template:
+    src: Caddyfile
+    dest: "{{ mnt_dir }}/caddy/Caddyfile"
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    mode: u=rw,g=r,o=

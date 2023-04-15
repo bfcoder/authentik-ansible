@@ -90,6 +90,15 @@
     groups: docker
     append: true
 
+- name: Create a web network
+  community.docker.docker_network:
+    name: web
+
+- name: Create an internal caddy_internal network
+  community.docker.docker_network:
+    name: caddy_internal
+    internal: true
+
 - name: Enable Docker service
   ansible.builtin.service:
     name: docker

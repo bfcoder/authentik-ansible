@@ -2,7 +2,33 @@
 version: '3.4'
 
 # modified from https://web.archive.org/web/20230414232745/https://goauthentik.io/docker-compose.yml
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+    driver: bridge
+
 services:
+  caddy:
+    image: ghcr.io/bfcoder/caddy-cloudflaredns:latest
+    restart: unless-stopped
+    logging:
+      driver: "local"
+      options:
+        max-size: "1g"
+        max-file: 30
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "{{ mnt_dir }}/caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
+      - "{{ mnt_dir }}/caddy/data:/data"
+      - "{{ mnt_dir }}/caddy/config:/config"
+    networks:
+      - web
+      - internal
   postgresql:
     image: docker.io/library/postgres:12-alpine
     restart: unless-stopped
@@ -20,6 +46,8 @@ services:
       - POSTGRES_DB=${PG_DB:-authentik}
     env_file:
       - .env
+    networks:
+      - internal
   redis:
     image: docker.io/library/redis:alpine
     command: --save 60 1 --loglevel warning
@@ -32,7 +60,11 @@ services:
       timeout: 3s
     volumes:
       - "{{ mnt_dir }}/redis:/data"
-  server:
+    networks:
+      - internal
+  authentik:
+    container_name: authentik
+    hostname: authentik
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2023.4.0}
     restart: unless-stopped
     command: server
@@ -47,10 +79,14 @@ services:
       - "{{ mnt_dir }}/custom_templates:/templates"
     env_file:
       - .env
-    ports:
-      - "${AUTHENTIK_PORT_HTTP:-9000}:9000"
-      - "${AUTHENTIK_PORT_HTTPS:-9443}:9443"
+    expose:
+      - 9000  # HTTP
+      - 9443  # HTTPS
+    networks:
+      - web
+      - internal
   worker:
+    container_name: authentik-worker
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2023.4.0}
     restart: unless-stopped
     command: worker
@@ -74,6 +110,8 @@ services:
       - "{{ mnt_dir }}/custom_templates:/templates"
     env_file:
       - .env
+    networks:
+      - internal
 
 # volumes:
 #   database:

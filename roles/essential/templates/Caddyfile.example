@@ -1,0 +1,14 @@
+{
+  email <youremail>
+}
+
+(dnschallenge) {
+  tls {
+    dns cloudflare ""
+  }
+}
+
+auth.<yourdomain>.com {
+  import dnschallenge
+  reverse_proxy authentikserver:3000
+}

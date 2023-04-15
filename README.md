@@ -25,6 +25,13 @@ cp inventory{.example,}
 ```
 Now modify and replace what you will need for your homelab in that example.
 
+## Copy/Edit Caddyfile example
+In roles/essential/templates is a Caddyfile.example you need to copy
+```
+cp roles/essential/templates/Caddyfile{.example,}
+```
+Now modify and replace what you will need for your homelab in that example.
+
 # Run
 
 ## Apply playbook with the following:
