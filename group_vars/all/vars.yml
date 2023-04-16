@@ -1,4 +1,4 @@
 ---
 username: ubuntu
 
-mnt_dir: /mnt/authentik_storage_2
+mnt_dir: /mnt/authentik_storage
