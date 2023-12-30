@@ -1,7 +1,36 @@
 ---
-version: "3.4"
+version: '3.4'
+
+# modified from https://web.archive.org/web/20230414232745/https://goauthentik.io/docker-compose.yml
+# https://web.archive.org/web/20230415133810/https://helgeklein.com/blog/authentik-authentication-sso-user-management-password-reset-for-home-networks/
+# https://web.archive.org/web/20230415133819/https://helgeklein.com/blog/automatic-https-certificates-for-services-on-internal-home-network-without-opening-firewall-port/
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+    driver: bridge
 
 services:
+  caddy:
+    image: ghcr.io/bfcoder/caddy-cloudflaredns:latest
+    restart: unless-stopped
+    logging:
+      driver: "local"
+      options:
+        max-size: "1g"
+        max-file: 30
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "{{ mnt_dir }}/caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
+      - "{{ mnt_dir }}/caddy/data:/data"
+      - "{{ mnt_dir }}/caddy/config:/config"
+    networks:
+      - web
+      - internal
   postgresql:
     image: docker.io/library/postgres:12-alpine
     restart: unless-stopped
@@ -19,6 +48,8 @@ services:
       POSTGRES_DB: ${PG_DB:-authentik}
     env_file:
       - .env
+    networks:
+      - internal
   redis:
     image: docker.io/library/redis:alpine
     command: --save 60 1 --loglevel warning
@@ -31,6 +62,8 @@ services:
       timeout: 3s
     volumes:
       - redis:/data
+    networks:
+      - internal
   server:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2023.10.5}
     restart: unless-stopped
@@ -42,8 +75,8 @@ services:
       AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
       AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
     volumes:
-      - ./media:/media
-      - ./custom-templates:/templates
+      - "{{ mnt_dir }}/media:/media"
+      - "{{ mnt_dir }}/custom_templates:/templates"
     env_file:
       - .env
     ports:
@@ -52,6 +85,9 @@ services:
     depends_on:
       - postgresql
       - redis
+    networks:
+      - web
+      - internal
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2023.10.5}
     restart: unless-stopped
@@ -71,17 +107,25 @@ services:
     user: root
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./media:/media
-      - ./certs:/certs
-      - ./custom-templates:/templates
+      - "{{ mnt_dir }}/media:/media"
+      - "{{ mnt_dir }}/certs:/certs"
+      - "{{ mnt_dir }}/custom_templates:/templates"
     env_file:
       - .env
     depends_on:
       - postgresql
       - redis
+    networks:
+      - internal
 
 volumes:
   database:
-    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "{{ mnt_dir }}/database"
   redis:
-    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "{{ mnt_dir }}/redis"

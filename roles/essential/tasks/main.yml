@@ -20,24 +20,27 @@
     update_cache: true
   become: yes
 
-- name: Create app directories
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-  loop:
-    - "{{ mnt_dir }}/database"
-    - "{{ mnt_dir }}/redis"
-    - "{{ mnt_dir }}/media"
-    - "{{ mnt_dir }}/certs"
-    - "{{ mnt_dir }}/custom_templates"
-    - "{{ mnt_dir }}/caddy"
-    - "{{ mnt_dir }}/caddy/data"
-    - "{{ mnt_dir }}/caddy/config"
+# - name: Create app directories
+#   ansible.builtin.file:
+#     path: "{{ item }}"
+#     state: directory
+#   loop:
+#     - "{{ mnt_dir }}"
+#     - "{{ mnt_dir }}/database"
+#     - "{{ mnt_dir }}/redis"
+#     - "{{ mnt_dir }}/media"
+#     - "{{ mnt_dir }}/certs"
+#     - "{{ mnt_dir }}/custom_templates"
+#     - "{{ mnt_dir }}/caddy"
+#     - "{{ mnt_dir }}/caddy/data"
+#     - "{{ mnt_dir }}/caddy/config"
+#   become: yes
 
-- name: Copy Caddyfile
-  ansible.builtin.template:
-    src: Caddyfile
-    dest: "{{ mnt_dir }}/caddy/Caddyfile"
-    owner: "{{ansible_ssh_user}}"
-    group: "{{ansible_ssh_user}}"
-    mode: u=rw,g=r,o=
+# - name: Copy Caddyfile
+#   ansible.builtin.template:
+#     src: Caddyfile
+#     dest: "{{ mnt_dir }}/caddy/Caddyfile"
+#     # owner: "{{ansible_ssh_user}}"
+#     # group: "{{ansible_ssh_user}}"
+#     mode: u=rw,g=r,o=
+#   become: yes
